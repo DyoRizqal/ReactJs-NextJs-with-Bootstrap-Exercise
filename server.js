@@ -65,33 +65,42 @@ app.put('/api/mahasiswa/:nim', upload.single('foto'), (req, res) => {
     const { nama, tanggal_lahir, alamat } = req.body;
     const foto = req.file ? req.file.filename : null;
 
-    const query = 'UPDATE mahasiswa SET nama = ?, foto = ?, tanggal_lahir = ?, alamat = ? WHERE nim = ?';
-    connection.query(query, [nama, foto, tanggal_lahir, alamat, nim], (err, result) => {
-        if (err) throw err;
-        res.json({ message: 'Mahasiswa berhasil diupdate' });
+    const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE nim = ?';
+    connection.query(querySelectFoto, [nim], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui mahasiswa' });
+        }
+
+        let oldFotoPath = null;
+        if (rows.length > 0) {
+            oldFotoPath = rows[0].foto;
+        }
+
+        const query = 'UPDATE mahasiswa SET nama = ?, foto = ?, tanggal_lahir = ?, alamat = ? WHERE nim = ?';
+        connection.query(query, [nama, foto, tanggal_lahir, alamat, nim], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui mahasiswa' });
+            }
+
+            if (oldFotoPath && oldFotoPath !== foto) {
+                const fotoPath = path.join(__dirname, 'public', 'uploads', oldFotoPath);
+                fs.unlink(fotoPath, (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Gagal menghapus file foto lama' });
+                    }
+                    console.log(`File ${fotoPath} berhasil dihapus`);
+                    res.json({ message: 'Mahasiswa berhasil diperbarui' });
+                });
+            } else {
+                res.json({ message: 'Mahasiswa berhasil diperbarui' });
+            }
+        });
     });
 });
 
-// app.delete('/api/mahasiswa/:nim', (req, res) => {
-//     const nim = req.params.nim;
-
-//     const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE nim = ?';
-//     connection.query(querySelectFoto, [nim], (err, rows) => {
-//         if (err) throw err;
-//         if (rows.length > 0) {
-//             const fotoPath = path.join(__dirname, 'public', 'uploads', rows[0].foto);
-//             fs.unlink(fotoPath, (err) => {
-//                 if (err) console.error(err);
-//             });
-//         }
-//     });
-
-//     const query = 'DELETE FROM mahasiswa WHERE nim = ?';
-//     connection.query(query, [nim], (err, result) => {
-//         if (err) throw err;
-//         res.json({ message: 'Mahasiswa berhasil dihapus' });
-//     });
-// });
 app.delete('/api/mahasiswa/:nim', (req, res) => {
     const nim = req.params.nim;
 
