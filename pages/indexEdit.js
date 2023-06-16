@@ -25,7 +25,6 @@ const IndexEdit = () => {
         try {
             const response = await axios.get(`http://localhost:5000/api/mahasiswa/${nim}`);
             const mahasiswa = response.data;
-
             setEditNim(mahasiswa.nim);
             setEditNama(mahasiswa.nama);
             setCurrentNama(mahasiswa.nama);

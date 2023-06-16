@@ -60,7 +60,6 @@ const IndexPage = () => {
                                             <Card.Img src={`/uploads/${mhs.foto}`} alt="Foto" style={{ maxHeight: '350px' }} />
                                         )}
                                         <Card.Title className="pt-3 pb-2"><h4 className='text-bold'>{mhs.nama}</h4></Card.Title>
-                                        <Card.Text>
                                             <table className="table table-borderless custom-table">
                                                 <tbody>
                                                     <tr>
@@ -80,9 +79,6 @@ const IndexPage = () => {
                                                     </tr>
                                                 </tbody>
                                             </table>
-
-
-                                        </Card.Text>
 
                                         <div className="mt-3">
                                             <Button variant="primary" className="black-btn" onClick={() => handleEdit(mhs.nim)}>

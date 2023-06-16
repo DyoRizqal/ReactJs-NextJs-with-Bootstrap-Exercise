@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const HomePage = () => {
     return (
         <div>
-        
+
             <Layout>
                 <div className="text-center welcomeContainer">
                     <img src="/assets/welcome.png" alt="Gambar" className="welcomeImage" />

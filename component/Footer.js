@@ -1,21 +1,15 @@
 import React from 'react';
-import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
-    const router = useRouter();
-
-    const handleLinkClick = (path) => {
-        router.push(path);
-    };
 
     return (
         <footer id="footer" className='fixed-bottom'>
             <div className="container">
                 <div className="copyright">
-                    {new Date().getFullYear()}  © <strong>DRP</strong>. All Rights Reserved
+                    {new Date().getFullYear()}  © <strong>DRP</strong> All Rights Reserved
                 </div>
                 <div className="social-links">
 

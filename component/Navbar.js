@@ -26,6 +26,11 @@ const Navbar = () => {
                                 Master Student
                             </a>
                         </li>
+                        <li className="nav-item">
+                            <a href='#' className="nav-link" onClick={() => handleLinkClick('/indexAbout')}>
+                                About Website
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

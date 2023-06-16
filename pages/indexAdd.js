@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 const IndexAddPage = () => {
     const router = useRouter();
     const [mahasiswa, setMahasiswa] = useState([]);
-    const [isEditFormVisible, setIsEditFormVisible] = useState(false);
     const [nim, setNim] = useState('');
     const [nama, setNama] = useState('');
     const [foto, setFoto] = useState(null);
