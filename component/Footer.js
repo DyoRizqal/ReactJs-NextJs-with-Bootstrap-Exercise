@@ -9,7 +9,10 @@ const Navbar = () => {
         <footer id="footer" className='fixed-bottom'>
             <div className="container">
                 <div className="copyright">
-                    {new Date().getFullYear()}  © <strong>DRP</strong> All Rights Reserved
+                    <div className="qr">
+                        <img src="./assets/qr.png" alt="QR Code" /> 
+                        {new Date().getFullYear()}  © <strong>DRP</strong> All Rights Reserved
+                    </div>
                 </div>
                 <div className="social-links">
 

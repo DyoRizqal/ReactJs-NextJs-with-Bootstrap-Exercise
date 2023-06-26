@@ -5,7 +5,6 @@ import { Card, Button, Container, Form } from 'react-bootstrap';
 import Layout from '../component/Layout';
 import { useRouter } from 'next/router';
 
-
 const IndexAddPage = () => {
     const router = useRouter();
     const [mahasiswa, setMahasiswa] = useState([]);
@@ -14,10 +13,13 @@ const IndexAddPage = () => {
     const [foto, setFoto] = useState(null);
     const [tanggalLahir, setTanggalLahir] = useState('');
     const [alamat, setAlamat] = useState('');
-
+    const [webinarList, setWebinarList] = useState([]);
+    const [selectedWebinar, setSelectedWebinar] = useState('');
+  
 
     useEffect(() => {
         fetchMahasiswa();
+        fetchWebinarList();
     }, []);
 
     const fetchMahasiswa = async () => {
@@ -28,11 +30,20 @@ const IndexAddPage = () => {
                 tanggal_lahir: formatDate(mhs.tanggal_lahir),
             }));
             setMahasiswa(formattedMahasiswa);
-            // setMahasiswa(response.data);  
         } catch (error) {
             console.error(error);
         }
     };
+
+    const fetchWebinarList = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/webinar');
+            setWebinarList(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     function formatDate(dateString) {
         const date = new Date(dateString);
         const year = date.getFullYear().toString();
@@ -40,10 +51,15 @@ const IndexAddPage = () => {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
+
     const handleFileChange = (event) => {
-        // setFoto(event.target.files[0]);
         const file = event.target.files[0];
         setFoto(file);
+    };
+
+    const handleWebinarChange = (event) => {
+        const selectedValue = event.target.value;
+        setSelectedWebinar(selectedValue);
     };
 
     const handleSubmit = async (event) => {
@@ -58,6 +74,7 @@ const IndexAddPage = () => {
             if (foto) {
                 formData.append('foto', foto);
             }
+            formData.append('id_webinar', selectedWebinar);
 
             await axios.post('http://localhost:5000/api/mahasiswa', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -72,27 +89,41 @@ const IndexAddPage = () => {
     return (
         <div>
             <Layout>
-                <Container className='mt-4'>
+                <Container className="mt-4">
                     <Card>
                         <Card.Body>
                             <h2>Tambah Mahasiswa</h2>
                             <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId="formNIM" className='p-2'>
+                                <Form.Group controlId="formNIM" className="p-2">
                                     <Form.Label>NIM</Form.Label>
-                                    <Form.Control type="text" placeholder="NIM" value={nim} onChange={(e) => setNim(e.target.value)} required autoComplete='off' />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="NIM"
+                                        value={nim}
+                                        onChange={(e) => setNim(e.target.value)}
+                                        required
+                                        autoComplete="off"
+                                    />
                                 </Form.Group>
 
-                                <Form.Group controlId="formNama" className='p-2'>
+                                <Form.Group controlId="formNama" className="p-2">
                                     <Form.Label>Nama</Form.Label>
-                                    <Form.Control type="text" placeholder="Nama" value={nama} onChange={(e) => setNama(e.target.value)} required autoComplete='off' />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Nama"
+                                        value={nama}
+                                        onChange={(e) => setNama(e.target.value)}
+                                        required
+                                        autoComplete="off"
+                                    />
                                 </Form.Group>
 
-                                <Form.Group controlId="formFoto" className='p-2'>
+                                <Form.Group controlId="formFoto" className="p-2">
                                     <Form.Label>Foto</Form.Label>
                                     <Form.Control type="file" name="foto" onChange={handleFileChange} />
                                 </Form.Group>
 
-                                <Form.Group controlId="formTanggalLahir" className='p-2'>
+                                <Form.Group controlId="formTanggalLahir" className="p-2">
                                     <Form.Label>Tanggal Lahir</Form.Label>
                                     <Form.Control
                                         type="date"
@@ -103,13 +134,32 @@ const IndexAddPage = () => {
                                     />
                                 </Form.Group>
 
-                                <Form.Group controlId="formAlamat" className='p-2'>
+                                <Form.Group controlId="formAlamat" className="p-2">
                                     <Form.Label>Alamat</Form.Label>
-                                    <Form.Control type="text" placeholder="Alamat" value={alamat} onChange={(e) => setAlamat(e.target.value)} required autoComplete='off' />
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Alamat"
+                                        value={alamat}
+                                        onChange={(e) => setAlamat(e.target.value)}
+                                        required
+                                        autoComplete="off"
+                                    />
                                 </Form.Group>
 
-                                <Form.Group controlId="btnSubmit" className='p-2'>
-                                    <Button variant="success" type="submit" className='p-2 btn'>
+                                <Form.Group controlId="formWebinar" className="p-2">
+                                    <Form.Label>Pilih Webinar</Form.Label>
+                                    <Form.Control as="select" value={selectedWebinar} onChange={handleWebinarChange}>
+                                        <option value="">Pilih Webinar</option>
+                                        {webinarList.map((webinar) => (
+                                            <option key={webinar.id} value={webinar.id}>
+                                                {webinar.nama_webinar}
+                                            </option>
+                                        ))}
+                                    </Form.Control>
+                                </Form.Group>
+
+                                <Form.Group controlId="btnSubmit" className="p-2">
+                                    <Button variant="success" type="submit" className="p-2 btn">
                                         Simpan
                                     </Button>
                                 </Form.Group>

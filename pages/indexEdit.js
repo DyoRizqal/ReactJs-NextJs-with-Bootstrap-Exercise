@@ -7,29 +7,48 @@ import Layout from '../component/Layout';
 
 const IndexEdit = () => {
     const router = useRouter();
-    const { nim } = router.query;
+    const { id } = router.query;
     const [currentNama, setCurrentNama] = useState('');
     const [editNim, setEditNim] = useState('');
     const [editNama, setEditNama] = useState('');
-    const [editFoto, setEditFoto] = useState(null);
+    const [editFoto, setEditFoto] = useState('');
+    const [currentFoto, setCurrentFoto] = useState('');
     const [editTanggalLahir, setEditTanggalLahir] = useState('');
     const [editAlamat, setEditAlamat] = useState('');
+    const [webinarList, setWebinarList] = useState([]);
+    const [selectedWebinar, setSelectedWebinar] = useState('');
+    const handleWebinarChange = (event) => {
+        setSelectedWebinar(event.target.value);
+    };
 
     useEffect(() => {
-        if (nim) {
-            fetchMahasiswa(nim);
+        if (id) {
+            fetchMahasiswa(id);
+            fetchWebinarList();
         }
-    }, [nim]);
+    }, [id]);
 
-    const fetchMahasiswa = async (nim) => {
+    const fetchMahasiswa = async (id) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/mahasiswa/${nim}`);
+            const response = await axios.get(`http://localhost:5000/api/mahasiswa/${id}`);
             const mahasiswa = response.data;
             setEditNim(mahasiswa.nim);
             setEditNama(mahasiswa.nama);
             setCurrentNama(mahasiswa.nama);
+            setEditFoto(mahasiswa.foto);
+            setCurrentFoto(mahasiswa.foto);
             setEditTanggalLahir(formatDate(mahasiswa.tanggal_lahir));
             setEditAlamat(mahasiswa.alamat);
+            setSelectedWebinar(mahasiswa.id_webinar);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchWebinarList = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/webinar');
+            setWebinarList(response.data);
         } catch (error) {
             console.error(error);
         }
@@ -47,26 +66,32 @@ const IndexEdit = () => {
         event.preventDefault();
         try {
             const formData = new FormData();
-            formData.append('nim', editNim);
+            formData.append('nim', editNim); // Perbaiki baris ini
             formData.append('nama', editNama);
-            formData.append('foto', editFoto);
+            if (editFoto) {
+                formData.append('foto', editFoto);
+            } else {
+                formData.append('foto', currentFoto);
+            }
             formData.append('tanggal_lahir', editTanggalLahir);
             formData.append('alamat', editAlamat);
+            formData.append('id_webinar', selectedWebinar);
 
-            await axios.put(`http://localhost:5000/api/mahasiswa/${nim}`, formData, {
+            await axios.put(`http://localhost:5000/api/mahasiswa/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+                params: { id },
             });
 
             router.push('/indexAll');
-
         } catch (error) {
             console.error(error);
         }
     };
 
+
     return (
         <Layout>
-            <Container className="mt-4">
+            <Container className="mt-4 ">
                 <Card>
                     <Card.Body>
                         <h2>Edit Mahasiswa {currentNama}</h2>
@@ -115,9 +140,21 @@ const IndexEdit = () => {
                                 />
                             </Form.Group>
 
+                            <Form.Group controlId="formWebinar" className="p-2">
+                                <Form.Label>Pilih Webinar</Form.Label>
+                                <Form.Control as="select" value={selectedWebinar} onChange={handleWebinarChange}>
+                                    <option value="">Pilih Webinar</option>
+                                    {webinarList.map((webinar) => (
+                                        <option key={webinar.id} value={webinar.id}>
+                                            {webinar.nama_webinar}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+
                             <Form.Group controlId="btnSubmit" className="p-2">
                                 <Button variant="success" type="submit" className="p-2">
-                                    Ubah Data Mahasiswa
+                                    Simpan Perubahan
                                 </Button>
                             </Form.Group>
                         </Form>

@@ -9,7 +9,6 @@ const fs = require('fs');
 const app = express();
 const port = 5000;
 
-// Konfigurasi MySQL
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -22,7 +21,6 @@ connection.connect((err) => {
     console.log('Connected to the MySQL server');
 });
 
-// Konfigurasi Multer untuk mengunggah foto
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/uploads/');
@@ -39,8 +37,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Definisikan rute-rute untuk CRUD
-
+// Get All Mahasiswa
 app.get('/api/mahasiswa', (req, res) => {
     const query = 'SELECT * FROM mahasiswa';
     connection.query(query, (err, rows) => {
@@ -49,24 +46,26 @@ app.get('/api/mahasiswa', (req, res) => {
     });
 });
 
+// Tambah Mahasiswa
 app.post('/api/mahasiswa', upload.single('foto'), (req, res) => {
-    const { nim, nama, tanggal_lahir, alamat } = req.body;
+    const { nim, nama, tanggal_lahir, alamat, id_webinar } = req.body;
     const foto = req.file ? req.file.filename : null;
 
-    const query = 'INSERT INTO mahasiswa (nim, nama, foto, tanggal_lahir, alamat) VALUES (?, ?, ?, ?, ?)';
-    connection.query(query, [nim, nama, foto, tanggal_lahir, alamat], (err, result) => {
+    const query = 'INSERT INTO mahasiswa (nim, nama, foto, tanggal_lahir, alamat, id_webinar) VALUES (?, ?, ?, ?, ?, ?)';
+    connection.query(query, [nim, nama, foto, tanggal_lahir, alamat, id_webinar], (err, result) => {
         if (err) throw err;
         res.json({ message: 'Mahasiswa berhasil ditambahkan' });
     });
 });
 
-app.put('/api/mahasiswa/:nim', upload.single('foto'), (req, res) => {
-    const nim = req.params.nim;
-    const { nama, tanggal_lahir, alamat } = req.body;
-    const foto = req.file ? req.file.filename : null;
+// Update Mahasiswa
+app.put('/api/mahasiswa/:id', upload.single('foto'), (req, res) => {
+    const id = req.params.id;
+    const { nim, nama, tanggal_lahir, alamat, id_webinar } = req.body;
+    let foto = req.file ? req.file.filename : null;
 
-    const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE nim = ?';
-    connection.query(querySelectFoto, [nim], (err, rows) => {
+    const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE id = ?';
+    connection.query(querySelectFoto, [id], (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui mahasiswa' });
@@ -77,14 +76,18 @@ app.put('/api/mahasiswa/:nim', upload.single('foto'), (req, res) => {
             oldFotoPath = rows[0].foto;
         }
 
-        const query = 'UPDATE mahasiswa SET nama = ?, foto = ?, tanggal_lahir = ?, alamat = ? WHERE nim = ?';
-        connection.query(query, [nama, foto, tanggal_lahir, alamat, nim], (err, result) => {
+        if (!foto) {
+            foto = oldFotoPath;
+        }
+
+        const query = 'UPDATE mahasiswa SET nim = ?, nama = ?, foto = ?, tanggal_lahir = ?, alamat = ?, id_webinar = ? WHERE id = ?';
+        connection.query(query, [nim, nama, foto, tanggal_lahir, alamat, id_webinar, id], (err, result) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui mahasiswa' });
             }
 
-            if (oldFotoPath && oldFotoPath !== foto) {
+            if (oldFotoPath && oldFotoPath !== foto && foto !== null) {
                 const fotoPath = path.join(__dirname, 'public', 'uploads', oldFotoPath);
                 fs.unlink(fotoPath, (err) => {
                     if (err) {
@@ -101,11 +104,12 @@ app.put('/api/mahasiswa/:nim', upload.single('foto'), (req, res) => {
     });
 });
 
-app.delete('/api/mahasiswa/:nim', (req, res) => {
-    const nim = req.params.nim;
+// Delete Mahasiswa
+app.delete('/api/mahasiswa/:id', (req, res) => {
+    const id = req.params.id;
 
-    const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE nim = ?';
-    connection.query(querySelectFoto, [nim], (err, rows) => {
+    const querySelectFoto = 'SELECT foto FROM mahasiswa WHERE id = ?';
+    connection.query(querySelectFoto, [id], (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Terjadi kesalahan saat menghapus mahasiswa' });
@@ -124,8 +128,8 @@ app.delete('/api/mahasiswa/:nim', (req, res) => {
             });
         }
 
-        const queryDeleteMahasiswa = 'DELETE FROM mahasiswa WHERE nim = ?';
-        connection.query(queryDeleteMahasiswa, [nim], (err) => {
+        const queryDeleteMahasiswa = 'DELETE FROM mahasiswa WHERE id = ?';
+        connection.query(queryDeleteMahasiswa, [id], (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ message: 'Terjadi kesalahan saat menghapus mahasiswa' });
@@ -136,12 +140,10 @@ app.delete('/api/mahasiswa/:nim', (req, res) => {
     });
 });
 
-
-
-app.get('/api/mahasiswa/:nim', (req, res) => {
-    const nim = req.params.nim;
-    const query = 'SELECT * FROM mahasiswa WHERE nim = ?';
-    connection.query(query, [nim], (err, rows) => {
+app.get('/api/mahasiswa/:id', (req, res) => {
+    const id = req.params.id;
+    const query = 'SELECT * FROM mahasiswa WHERE id = ?';
+    connection.query(query, [id], (err, rows) => {
         if (err) throw err;
         if (rows.length > 0) {
             res.json(rows[0]);
@@ -150,6 +152,142 @@ app.get('/api/mahasiswa/:nim', (req, res) => {
         }
     });
 });
+
+
+// Webinar
+const uploadWebinar = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, 'public/cover/');
+        },
+        filename: (req, file, cb) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        },
+    })
+});
+app.post('/api/webinar', uploadWebinar.single('cover'), (req, res) => {
+    const { nama_webinar, narasumber, tanggal, deskripsi } = req.body;
+    const cover = req.file ? req.file.filename : null;
+
+    const query = 'INSERT INTO webinar (cover, nama_webinar, narasumber, tanggal, deskripsi) VALUES (?, ?, ?, ?, ?)';
+    connection.query(query, [cover, nama_webinar, narasumber, tanggal, deskripsi], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat menambahkan webinar' });
+        }
+        res.json({ message: 'Webinar berhasil ditambahkan' });
+    });
+});
+
+app.put('/api/webinar/:id', uploadWebinar.single('cover'), (req, res) => {
+    const id = req.params.id;
+    const { nama_webinar, narasumber, tanggal, deskripsi } = req.body;
+    let cover = req.file ? req.file.filename : null;
+
+    const querySelectCover = 'SELECT cover FROM webinar WHERE id = ?';
+    connection.query(querySelectCover, [id], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui webinar' });
+        }
+
+        let oldCoverPath = null;
+        if (rows.length > 0) {
+            oldCoverPath = rows[0].cover;
+        }
+
+        if (!cover) {
+            cover = oldCoverPath;
+        }
+
+        const query = 'UPDATE webinar SET cover = ?, nama_webinar = ?, narasumber = ?, tanggal = ?, deskripsi = ? WHERE id = ?';
+        connection.query(query, [cover, nama_webinar, narasumber, tanggal, deskripsi, id], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Terjadi kesalahan saat memperbarui webinar' });
+            }
+
+            if (oldCoverPath && oldCoverPath !== cover && cover !== null) {
+                const coverPath = path.join(__dirname, 'public', 'cover', oldCoverPath);
+                fs.unlink(coverPath, (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ message: 'Gagal menghapus file cover lama' });
+                    }
+                    console.log(`File ${coverPath} berhasil dihapus`);
+                    res.json({ message: 'Webinar berhasil diperbarui' });
+                });
+            } else {
+                res.json({ message: 'Webinar berhasil diperbarui' });
+            }
+        });
+    });
+});
+
+app.delete('/api/webinar/:id', (req, res) => {
+    const id = req.params.id;
+
+    const querySelectCover = 'SELECT cover FROM webinar WHERE id = ?';
+    connection.query(querySelectCover, [id], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat menghapus webinar' });
+        }
+
+        if (rows.length > 0) {
+            const coverPath = path.join(__dirname, 'public', 'cover', rows[0].cover);
+
+            fs.unlink(coverPath, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ message: 'Gagal menghapus file cover' });
+                }
+
+                console.log(`File ${coverPath} berhasil dihapus`);
+            });
+        }
+
+        const queryDeleteWebinar = 'DELETE FROM webinar WHERE id = ?';
+        connection.query(queryDeleteWebinar, [id], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Terjadi kesalahan saat menghapus webinar' });
+            }
+
+            res.json({ message: 'Webinar berhasil dihapus' });
+        });
+    });
+});
+
+app.get('/api/webinar', (req, res) => {
+    const query = 'SELECT * FROM webinar';
+    connection.query(query, (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat mengambil data webinar' });
+        }
+        res.json(rows);
+    });
+});
+
+app.get('/api/webinar/:id', (req, res) => {
+    const id = req.params.id;
+    const query = 'SELECT * FROM webinar WHERE id = ?';
+    connection.query(query, [id], (err, rows) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Terjadi kesalahan saat mengambil data webinar' });
+        }
+        if (rows.length > 0) {
+            res.json(rows[0]);
+        } else {
+            res.status(404).json({ message: 'Webinar tidak ditemukan' });
+        }
+    });
+});
+
+
 
 // Jalankan server
 app.listen(port, () => {

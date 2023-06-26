@@ -9,14 +9,14 @@ const AboutPage = () => {
             <Layout>
                 <Container className="p-3 mt-3 mb-5">
                     <Row className="justify-content-center">
-                        <Card className='mb-3'>
+                        {/* <Card className='mb-3'>
                             <Card.Body>
                                 <Card.Title className="pt-3 pb-2 text-left"><h4 className='text-bold text-red'>TENTANG APLIKASI</h4></Card.Title>
                                 <Card.Title className="text-left"><h6>Setelah belajar mata kuliah pemrograman web dan dalam rangka Ujian Akhir Semester (UAS), saya mempersembahkan sebuah website yang saya buat. Website ini merupakan hasil dari pembelajaran saya tentang cara membuat web menggunakan ReactJS, NextJs, dan Bootstrap</h6></Card.Title>
                                 <Card.Title className="text-left"><h6>Saya mencoba mengaplikasikan pengetahuan yang saya dapat selama kuliah untuk membuat website ini. Saya berfokus pada hal-hal seperti bagaimana tata letaknya harus terlihat bagus , bagaimana pengunjung dapat dengan mudah berpindah halaman, dan tentunya, tampilan yang menarik. Saya juga menggunakan HTML, CSS, dan JavaScript untuk memberikan efek interaktif dan menarik.</h6></Card.Title>
                                 <Card.Title className="text-left"><h6>Website ini adalah hasil belajar saya dalam menguasai materi pemrograman web. Saya berharap website ini bisa menjadi bukti kemajuan saya dalam memahami dan mengimplementasikan ilmu pemrograman web dalam praktiknya.</h6></Card.Title>
                             </Card.Body>
-                        </Card>
+                        </Card> */}
                         <Col md={4}>
                             <Card className='mb-3'>
                                 <Card.Body>

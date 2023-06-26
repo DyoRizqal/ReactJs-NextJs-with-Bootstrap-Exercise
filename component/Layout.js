@@ -9,6 +9,7 @@ const Layout = ({ children }) => {
             <Navbar />
             {children}
             <Footer />
+            <div className="mb-20-child"></div>
         </div>
     );
 };

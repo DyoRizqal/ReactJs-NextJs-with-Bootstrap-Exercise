@@ -8,8 +8,8 @@ const HomePage = () => {
 
             <Layout>
                 <div className="text-center welcomeContainer">
-                    <img src="/assets/welcome.png" alt="Gambar" className="welcomeImage" />
-                    <p className="welcomeText">Selamat Datang Di Halaman Website STMIK Jayakarta</p>
+                    <img src="/assets/logo-blck.png" alt="Gambar" className="welcomeImage" />
+                    <p className="welcomeText">Selamat Datang Di Halaman Website Dreamer Academy</p>
                 </div>
             </Layout>
         </div>

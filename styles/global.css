@@ -16,14 +16,11 @@
 }
 
 .welcomeImage {
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    object-fit: cover;
+    max-width: 200%;
 }
 
 .welcomeText {
-    font-size: 24px;
+    font-size: 35pt;
     font-weight: bold;
     margin-top: 20px;
 }
@@ -42,9 +39,22 @@
     margin-bottom: 100px;
 }
 
+.mb-15 {
+    margin-bottom: 170px;
+}
+
+.mb-20-child {
+    margin-bottom: 200px;
+}
+
+.mb-20 {
+    margin-bottom: 2000px;
+}
+
 .black-btn {
     background: #090909 !important;
     border: #090909 !important;
+    margin-right: 5px;
 }
 
 #footer {
@@ -111,4 +121,15 @@
 
 #footer .copyright {
     font-size: 18px;
+}
+
+.qr {
+    vertical-align: middle;
+}
+
+
+#footer .copyright .qr img {
+    display: flex;
+    max-width: 25%;
+    margin-bottom: 5px;
 }

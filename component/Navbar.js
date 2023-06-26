@@ -10,20 +10,25 @@ const Navbar = () => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div className="container p-2">
+            <div className="container p-2 d-flex align-items-center justify-content-between">
                 <a href='#' className="navbar-brand font-weight-bold text-bold" onClick={() => handleLinkClick('/')}>
-                    DyoRizqal
+                    <img src="./assets/logo.png" alt="DyoRizqal" />
                 </a>
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul className="navbar-nav mr-auto">
+                <div>
+                    <ul className="navbar-nav ml-auto">
                         <li className="nav-item">
                             <a href='#' className="nav-link" onClick={() => handleLinkClick('/indexAll')}>
-                                Homepage
+                                Master Student
                             </a>
                         </li>
                         <li className="nav-item">
                             <a href='#' className="nav-link" onClick={() => handleLinkClick('/indexAdd')}>
-                                Master Student
+                                Register Student
+                            </a>
+                        </li>
+                        <li className="nav-item">
+                            <a href='#' className="nav-link" onClick={() => handleLinkClick('/indexWebinar')}>
+                                Master Webinar
                             </a>
                         </li>
                         <li className="nav-item">
